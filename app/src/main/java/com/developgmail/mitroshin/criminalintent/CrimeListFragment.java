@@ -18,6 +18,9 @@ public class CrimeListFragment extends Fragment {
 
     private RecyclerView mCrimeRecyclerView;
     private CrimeAdapter mAdapter;
+    private List<Crime> mCrimes;
+
+    private int clickedElementId;
 
     @Nullable
     @Override
@@ -47,7 +50,7 @@ public class CrimeListFragment extends Fragment {
             mAdapter = new CrimeAdapter(crimes);
             mCrimeRecyclerView.setAdapter(mAdapter);
         } else {
-            mAdapter.notifyDataSetChanged();
+            mAdapter.notifyItemChanged(clickedElementId);
         }
     }
 
@@ -78,14 +81,13 @@ public class CrimeListFragment extends Fragment {
 
         @Override
         public void onClick(View v) {
+            clickedElementId = mCrimes.indexOf(mCrime);
             Intent intent = CrimeActivity.newIntent(getActivity(), mCrime.getId());
             startActivity(intent);
         }
     }
 
     private class CrimeAdapter extends RecyclerView.Adapter<CrimeHolder> {
-
-        private List<Crime> mCrimes;
 
         public CrimeAdapter(List<Crime> crimes) {
             mCrimes = crimes;
