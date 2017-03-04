@@ -9,6 +9,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.TimePicker;
 
+import java.util.Calendar;
 import java.util.Date;
 
 public class TimePickerFragment extends DialogFragment {
@@ -31,7 +32,19 @@ public class TimePickerFragment extends DialogFragment {
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
 
+        Date time = (Date) getArguments().getSerializable(ARG_TIME);
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(time);
+        int hour = calendar.get(Calendar.HOUR_OF_DAY);
+        int minute = calendar.get(Calendar.MINUTE);
+
         View v = LayoutInflater.from(getActivity()).inflate(R.layout.dialog_time, null);
+
+        mTimePicker = (TimePicker) v.findViewById(R.id.dialog_time_picker);
+        mTimePicker.setIs24HourView(true);
+        mTimePicker.setCurrentHour(calendar.get(Calendar.HOUR_OF_DAY));
+        mTimePicker.setCurrentMinute(calendar.get(Calendar.MINUTE));
 
         return new AlertDialog.Builder(getActivity())
                 .setView(v)
