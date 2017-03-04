@@ -61,6 +61,12 @@ public class CrimeFragment extends Fragment{
             mCrime.setDate(date);
             updateDate();
         }
+
+        if (requestCode == REQUEST_TIME) {
+            Date time = (Date) data.getSerializableExtra(TimePickerFragment.EXTRA_TIME);
+            mCrime.setDate(time);
+            updateTime();
+        }
     }
 
     private void updateDate() {
@@ -144,7 +150,7 @@ public class CrimeFragment extends Fragment{
     private String convertCurrentTimeToString() {
         String result;
         Date currentTime = mCrime.getDate();
-        String timeTemplate = "h:mm";
+        String timeTemplate = "kk:mm";
         result = DateFormat.format(timeTemplate, currentTime).toString();
         return result;
     }
