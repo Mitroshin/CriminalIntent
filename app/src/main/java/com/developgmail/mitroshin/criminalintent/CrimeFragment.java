@@ -70,11 +70,11 @@ public class CrimeFragment extends Fragment{
     }
 
     private void updateDate() {
-        mDateButton.setText(convertCurrentDateToString());
+        mDateButton.setText(convertCurrentDateToString("date"));
     }
 
     private void updateTime() {
-        mTimeButton.setText(convertCurrentTimeToString());
+        mTimeButton.setText(convertCurrentDateToString("time"));
     }
 
     @Nullable
@@ -139,19 +139,17 @@ public class CrimeFragment extends Fragment{
         return view;
     }
 
-    private String convertCurrentDateToString() {
+    private String convertCurrentDateToString(String requestFormat) {
         String result;
         Date currentDate = mCrime.getDate();
-        String dateTemplate = "EEEE, MMM d, yyyy";
-        result = DateFormat.format(dateTemplate, currentDate).toString();
-        return result;
-    }
+        String currentTemplate = null;
 
-    private String convertCurrentTimeToString() {
-        String result;
-        Date currentTime = mCrime.getDate();
-        String timeTemplate = "kk:mm";
-        result = DateFormat.format(timeTemplate, currentTime).toString();
+        if (requestFormat.equals("date")) {
+            currentTemplate = "EEEE, MMM d, yyyy";
+        } else if (requestFormat.equals("time")){
+            currentTemplate = "kk:mm";
+        }
+        result = DateFormat.format(currentTemplate, currentDate).toString();
         return result;
     }
 }

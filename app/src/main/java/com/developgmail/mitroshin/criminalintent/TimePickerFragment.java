@@ -40,8 +40,6 @@ public class TimePickerFragment extends DialogFragment {
 
         final Calendar calendar = Calendar.getInstance();
         calendar.setTime(time);
-//        int hour = calendar.get(Calendar.HOUR_OF_DAY);
-//        int minute = calendar.get(Calendar.MINUTE);
 
         View v = LayoutInflater.from(getActivity()).inflate(R.layout.dialog_time, null);
 
