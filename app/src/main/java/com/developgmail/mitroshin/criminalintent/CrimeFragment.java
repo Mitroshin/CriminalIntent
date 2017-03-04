@@ -66,6 +66,10 @@ public class CrimeFragment extends Fragment{
         mDateButton.setText(convertCurrentDateToString());
     }
 
+    private void updateTime() {
+        mTimeButton.setText(convertCurrentTimeToString());
+    }
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
@@ -105,6 +109,7 @@ public class CrimeFragment extends Fragment{
         });
 
         mTimeButton = (Button) view.findViewById(R.id.crime_time);
+        updateTime();
         mTimeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -131,6 +136,14 @@ public class CrimeFragment extends Fragment{
         Date currentDate = mCrime.getDate();
         String dateTemplate = "EEEE, MMM d, yyyy";
         result = DateFormat.format(dateTemplate, currentDate).toString();
+        return result;
+    }
+
+    private String convertCurrentTimeToString() {
+        String result;
+        Date currentTime = mCrime.getDate();
+        String timeTemplate = "h:mm";
+        result = DateFormat.format(timeTemplate, currentTime).toString();
         return result;
     }
 }
