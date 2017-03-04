@@ -1,6 +1,7 @@
 package com.developgmail.mitroshin.criminalintent;
 
 import android.app.Dialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
@@ -51,5 +52,16 @@ public class TimePickerFragment extends DialogFragment {
                 .setTitle(R.string.time_picker_title)
                 .setPositiveButton(android.R.string.ok, null)
                 .create();
+    }
+
+    private void sendResult(int resultCode, Date time) {
+        if (getTargetFragment() == null) {
+            return;
+        }
+
+        Intent intent = new Intent();
+        intent.putExtra(EXTRA_TIME, time);
+
+        getTargetFragment().onActivityResult(getTargetRequestCode(), resultCode, intent);
     }
 }
