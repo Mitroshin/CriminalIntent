@@ -56,25 +56,25 @@ public class CrimeFragment extends Fragment{
             return;
         }
 
-        if (requestCode == REQUEST_DATE) {
-            Date date = (Date) data.getSerializableExtra(DatePickerFragment.EXTRA_DATE);
-            mCrime.setDate(date);
-            updateDate();
-        }
+        Date date = (Date) data.getSerializableExtra(DatePickerFragment.EXTRA_DATE);
+        mCrime.setDate(date);
 
-        if (requestCode == REQUEST_TIME) {
-            Date time = (Date) data.getSerializableExtra(TimePickerFragment.EXTRA_TIME);
-            mCrime.setDate(time);
-            updateTime();
+        switch (requestCode) {
+            case REQUEST_DATE:
+                updateDate();
+                break;
+            case REQUEST_TIME:
+                updateTime();
+                break;
         }
     }
 
     private void updateDate() {
-        mDateButton.setText(convertCurrentDateToString("date"));
+        mDateButton.setText(DateFormat.format("EEEE, MMMM d, yyyyy", mCrime.getDate()));
     }
 
     private void updateTime() {
-        mTimeButton.setText(convertCurrentDateToString("time"));
+        mTimeButton.setText(DateFormat.format("kk : mm", mCrime.getDate()));
     }
 
     @Nullable
@@ -137,19 +137,5 @@ public class CrimeFragment extends Fragment{
         });
 
         return view;
-    }
-
-    private String convertCurrentDateToString(String requestFormat) {
-        String result;
-        Date currentDate = mCrime.getDate();
-        String currentTemplate = null;
-
-        if (requestFormat.equals("date")) {
-            currentTemplate = "EEEE, MMM d, yyyy";
-        } else if (requestFormat.equals("time")){
-            currentTemplate = "kk:mm";
-        }
-        result = DateFormat.format(currentTemplate, currentDate).toString();
-        return result;
     }
 }
