@@ -1,9 +1,11 @@
 package com.developgmail.mitroshin.criminalintent;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 
 import com.developgmail.mitroshin.criminalintent.database.CrimeBaseHelper;
+import com.developgmail.mitroshin.criminalintent.database.CrimeDBSchema.CrimeTable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,5 +43,15 @@ public class CrimeLab {
 
     public void deleteCrime(Crime c) {
 
+    }
+
+    private static ContentValues getContentvAlues(Crime crime) {
+        ContentValues values = new ContentValues();
+        values.put(CrimeTable.Cols.UUID, crime.getId().toString());
+        values.put(CrimeTable.Cols.TITLE, crime.getTitle());
+        values.put(CrimeTable.Cols.DATE, crime.getDate().getTime());
+        values.put(CrimeTable.Cols.SOLVED, crime.isSolved() ? 1 : 0);
+
+        return values;
     }
 }
