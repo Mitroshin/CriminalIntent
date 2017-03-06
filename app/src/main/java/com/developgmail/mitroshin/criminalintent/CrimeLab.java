@@ -38,4 +38,9 @@ public class CrimeLab {
     public void addCrime(Crime c) {
         mCrimes.add(c);
     }
+
+    public void deleteCrime(Crime c) {
+        int index = mCrimes.indexOf(c);
+        mCrimes.remove(index);
+    }
 }

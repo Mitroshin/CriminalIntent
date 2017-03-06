@@ -28,8 +28,6 @@ public class CrimeListFragment extends Fragment {
 
     private boolean mSubtitleVisible;
 
-    private int clickedElementId;
-
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
@@ -120,7 +118,7 @@ public class CrimeListFragment extends Fragment {
             mAdapter = new CrimeAdapter(crimes);
             mCrimeRecyclerView.setAdapter(mAdapter);
         } else {
-            mAdapter.notifyItemChanged(clickedElementId);
+            mAdapter.notifyDataSetChanged();
         }
 
         updateSubtitle();
@@ -153,7 +151,6 @@ public class CrimeListFragment extends Fragment {
 
         @Override
         public void onClick(View v) {
-            clickedElementId = mCrimes.indexOf(mCrime);
             Intent intent = CrimePagerActivity.newIntent(getActivity(), mCrime.getId());
             startActivity(intent);
         }
