@@ -2,6 +2,7 @@ package com.developgmail.mitroshin.criminalintent;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
 import com.developgmail.mitroshin.criminalintent.database.CrimeBaseHelper;
@@ -64,5 +65,18 @@ public class CrimeLab {
                 new String[] {
                         uuidString
                 });
+    }
+
+    private Cursor queryCrimes(String whereClause, String[] whereArgs) {
+        Cursor cursor = mDatabase.query(
+                CrimeTable.NAME,
+                null,
+                whereClause,
+                whereArgs,
+                null,
+                null,
+                null
+        );
+        return cursor;
     }
 }
