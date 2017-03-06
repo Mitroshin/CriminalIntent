@@ -13,7 +13,6 @@ public class CrimeLab {
     private static CrimeLab sCrimeLab;
     private Context mContext;
     private SQLiteDatabase mDatabase;
-    private List<Crime> mCrimes;
 
     public static CrimeLab get(Context context) {
         if (sCrimeLab == null) {
@@ -25,28 +24,22 @@ public class CrimeLab {
     private CrimeLab (Context context) {
         mContext = context.getApplicationContext();
         mDatabase = new CrimeBaseHelper(mContext).getWritableDatabase();
-        mCrimes = new ArrayList<>();
     }
 
     public List<Crime> getCrimes() {
-        return mCrimes;
+        return new ArrayList<>();
     }
 
     public Crime getCrime(UUID id) {
-        for (Crime crime : mCrimes) {
-            if (crime.getId().equals(id)) {
-                return crime;
-            }
-        }
+
         return null;
     }
 
     public void addCrime(Crime c) {
-        mCrimes.add(c);
+
     }
 
     public void deleteCrime(Crime c) {
-        int index = mCrimes.indexOf(c);
-        mCrimes.remove(index);
+
     }
 }
