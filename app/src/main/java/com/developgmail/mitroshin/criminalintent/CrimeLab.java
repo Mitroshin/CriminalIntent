@@ -73,8 +73,11 @@ public class CrimeLab {
         mDatabase.insert(CrimeTable.NAME, null, values);
     }
 
-    public void deleteCrime(Crime c) {
-
+    public void deleteCrime(UUID crimeId) {
+        mDatabase.delete(CrimeTable.NAME, CrimeTable.Cols.UUID + " = ?",
+                new String[] {
+                        crimeId.toString()
+                });
     }
 
     private static ContentValues getContentValues(Crime crime) {
