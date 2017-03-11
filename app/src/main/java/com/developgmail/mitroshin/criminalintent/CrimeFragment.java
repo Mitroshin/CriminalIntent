@@ -82,7 +82,7 @@ public class CrimeFragment extends Fragment{
                     Uri contactUri = data.getData();
 
                     String[] queryFields = new String[] {
-                            ContactsContract.Contacts.DISPLAY_NAME
+                            ContactsContract.Contacts._ID
                     };
 
                     Cursor c = getActivity().getContentResolver()
@@ -94,9 +94,9 @@ public class CrimeFragment extends Fragment{
                         }
 
                         c.moveToFirst();
-                        String suspect = c.getString(0);
-                        mCrime.setSuspect(suspect);
-                        mSuspectButton.setText(suspect);
+                        long suspectId = c.getLong(0);
+                        mCrime.setSuspectId(suspectId);
+                        mSuspectButton.setText(Long.toString(suspectId));
                     } finally {
                         c.close();
                     }
@@ -199,8 +199,8 @@ public class CrimeFragment extends Fragment{
             }
         });
 
-        if (mCrime.getSuspect() != null) {
-            mSuspectButton.setText(mCrime.getSuspect());
+        if (mCrime.getSuspectId() != 0) {
+            mSuspectButton.setText(Long.toString(mCrime.getSuspectId()));
         }
 
         PackageManager packageManager = getActivity().getPackageManager();
@@ -248,7 +248,7 @@ public class CrimeFragment extends Fragment{
         String dateFormat = "EEEE, MMMM d, yyyyy";
         String dateString = DateFormat.format(dateFormat, mCrime.getDate()).toString();
 
-        String suspect = mCrime.getSuspect();
+        String suspect = Long.toString(mCrime.getSuspectId());
         if (suspect == null) {
             suspect = getString(R.string.crime_report_no_suspect);
         } else {
