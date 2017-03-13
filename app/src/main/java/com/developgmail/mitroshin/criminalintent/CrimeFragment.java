@@ -1,5 +1,6 @@
 package com.developgmail.mitroshin.criminalintent;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -7,10 +8,12 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.ShareCompat.IntentBuilder;
+import android.support.v4.content.ContextCompat;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.text.format.DateFormat;
@@ -24,6 +27,7 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import java.util.Date;
 import java.util.UUID;
@@ -36,6 +40,8 @@ public class CrimeFragment extends Fragment{
     private static final int REQUEST_DATE = 0;
     private static final int REQUEST_TIME = 1;
     private static final int REQUEST_CONTACT = 2;
+    private static final int REQUEST_PERMISSION_CONTACTS = 3;
+    private static final int REQUEST_PERMISSION_CALL = 4;
 
     private Crime mCrime;
     private EditText mTitleField;
@@ -195,7 +201,17 @@ public class CrimeFragment extends Fragment{
         mSuspectButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivityForResult(pickContact, REQUEST_CONTACT);
+                int permissionCheck = ContextCompat.checkSelfPermission(getActivity(),
+                        android.Manifest.permission.READ_CONTACTS);
+
+                if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
+                    requestPermissions(new String[] {
+                                    Manifest.permission.READ_CONTACTS
+                            },
+                            REQUEST_PERMISSION_CONTACTS);
+                } else {
+                    startActivityForResult(pickContact, REQUEST_CONTACT);
+                }
             }
         });
 
@@ -209,6 +225,21 @@ public class CrimeFragment extends Fragment{
         }
 
         return view;
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+
+        switch (requestCode) {
+            case REQUEST_PERMISSION_CONTACTS:
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    Intent pickContact = new Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI);
+                    startActivityForResult(pickContact, REQUEST_CONTACT);
+                } else {
+                    Toast.makeText(getActivity(), "Permission denied", Toast.LENGTH_SHORT).show();
+                }
+                return;
+        }
     }
 
     @Override
