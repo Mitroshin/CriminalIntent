@@ -27,6 +27,7 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.Toast;
 
 import java.util.Date;
@@ -50,6 +51,7 @@ public class CrimeFragment extends Fragment{
     private CheckBox mSolvedCheckBox;
     private Button mReportButton;
     private Button mSuspectButton;
+    private ImageButton mCallButton;
 
     public static CrimeFragment newInstance(UUID crimeId) {
         Bundle args = new Bundle();
@@ -88,7 +90,8 @@ public class CrimeFragment extends Fragment{
                     Uri contactUri = data.getData();
 
                     String[] queryFields = new String[] {
-                            ContactsContract.Contacts.DISPLAY_NAME
+                            ContactsContract.Contacts.DISPLAY_NAME,
+                            ContactsContract.Contacts._ID
                     };
 
                     Cursor c = getActivity().getContentResolver()
@@ -101,7 +104,9 @@ public class CrimeFragment extends Fragment{
 
                         c.moveToFirst();
                         String suspect = c.getString(0);
+                        long contactId = c.getLong(1);
                         mCrime.setSuspect(suspect);
+                        mCrime.setSuspectId(contactId);
                         mSuspectButton.setText(suspect);
                     } finally {
                         c.close();
@@ -218,6 +223,44 @@ public class CrimeFragment extends Fragment{
         if (mCrime.getSuspect() != null) {
             mSuspectButton.setText(mCrime.getSuspect());
         }
+
+        mCallButton = (ImageButton) view.findViewById(R.id.call_to_suspect);
+        mCallButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                if (mCrime.getSuspect() == null) {
+                    Toast.makeText(CrimeFragment.this.getActivity()
+                            , "You need to choose suspect"
+                            , Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                Uri contentUri = ContactsContract.CommonDataKinds.Phone.CONTENT_URI;
+                String selectClause = ContactsContract.CommonDataKinds.Phone.CONTACT_ID + " = ?";
+                String[] fields = {
+                        ContactsContract.CommonDataKinds.Phone.NUMBER
+                };
+                String[] selectParams = {
+                        Long.toString(mCrime.getSuspectId())
+                };
+                Cursor cursor = getActivity().getContentResolver()
+                        .query(contentUri, fields, selectClause, selectParams, null);
+
+                if (cursor != null && cursor.getCount() > 0) {
+                    try {
+                        cursor.moveToFirst();
+                        String number = cursor.getString(0);
+                        Uri phoneNumber = Uri.parse("tel:" + number);
+
+                        Intent intent = new Intent(Intent.ACTION_DIAL, phoneNumber);
+                        startActivity(intent);
+                    } finally {
+                        cursor.close();
+                    }
+                }
+            }
+        });
 
         PackageManager packageManager = getActivity().getPackageManager();
         if (packageManager.resolveActivity(pickContact, PackageManager.MATCH_DEFAULT_ONLY) == null) {
