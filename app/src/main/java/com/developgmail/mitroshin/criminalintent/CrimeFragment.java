@@ -90,10 +90,7 @@ public class CrimeFragment extends Fragment{
                     Uri contactUri = data.getData();
 
                     String[] queryFields = new String[] {
-<<<<<<< HEAD
                             ContactsContract.Contacts.DISPLAY_NAME,
-=======
->>>>>>> CriminalIntent/master
                             ContactsContract.Contacts._ID
                     };
 
@@ -106,17 +103,11 @@ public class CrimeFragment extends Fragment{
                         }
 
                         c.moveToFirst();
-<<<<<<< HEAD
                         String suspect = c.getString(0);
                         long contactId = c.getLong(1);
                         mCrime.setSuspect(suspect);
                         mCrime.setSuspectId(contactId);
                         mSuspectButton.setText(suspect);
-=======
-                        long suspectId = c.getLong(0);
-                        mCrime.setSuspectId(suspectId);
-                        mSuspectButton.setText(Long.toString(suspectId));
->>>>>>> CriminalIntent/master
                     } finally {
                         c.close();
                     }
