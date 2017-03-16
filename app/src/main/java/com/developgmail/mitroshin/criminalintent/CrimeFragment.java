@@ -212,8 +212,7 @@ public class CrimeFragment extends Fragment{
                 if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
                     requestPermissions(new String[] {
                                     Manifest.permission.READ_CONTACTS
-                            },
-                            REQUEST_PERMISSION_CONTACTS);
+                            }, REQUEST_PERMISSION_CONTACTS);
                 } else {
                     startActivityForResult(pickContact, REQUEST_CONTACT);
                 }
@@ -236,29 +235,18 @@ public class CrimeFragment extends Fragment{
                     return;
                 }
 
-                Uri contentUri = ContactsContract.CommonDataKinds.Phone.CONTENT_URI;
-                String selectClause = ContactsContract.CommonDataKinds.Phone.CONTACT_ID + " = ?";
-                String[] fields = {
-                        ContactsContract.CommonDataKinds.Phone.NUMBER
-                };
-                String[] selectParams = {
-                        Long.toString(mCrime.getSuspectId())
-                };
-                Cursor cursor = getActivity().getContentResolver()
-                        .query(contentUri, fields, selectClause, selectParams, null);
+                int permissionCheck = ContextCompat.checkSelfPermission(getActivity(),
+                        Manifest.permission.CALL_PHONE);
 
-                if (cursor != null && cursor.getCount() > 0) {
-                    try {
-                        cursor.moveToFirst();
-                        String number = cursor.getString(0);
-                        Uri phoneNumber = Uri.parse("tel:" + number);
-
-                        Intent intent = new Intent(Intent.ACTION_DIAL, phoneNumber);
-                        startActivity(intent);
-                    } finally {
-                        cursor.close();
-                    }
+                if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
+                    requestPermissions(new String[] {
+                            Manifest.permission.CALL_PHONE
+                    }, REQUEST_PERMISSION_CALL);
+                } else {
+                    getNumberAndCall();
                 }
+
+
             }
         });
 
@@ -268,6 +256,32 @@ public class CrimeFragment extends Fragment{
         }
 
         return view;
+    }
+
+    private void getNumberAndCall() {
+        Uri contentUri = ContactsContract.CommonDataKinds.Phone.CONTENT_URI;
+        String selectClause = ContactsContract.CommonDataKinds.Phone.CONTACT_ID + " = ?";
+        String[] fields = {
+                ContactsContract.CommonDataKinds.Phone.NUMBER
+        };
+        String[] selectParams = {
+                Long.toString(mCrime.getSuspectId())
+        };
+        Cursor cursor = getActivity().getContentResolver()
+                .query(contentUri, fields, selectClause, selectParams, null);
+
+        if (cursor != null && cursor.getCount() > 0) {
+            try {
+                cursor.moveToFirst();
+                String number = cursor.getString(0);
+                Uri phoneNumber = Uri.parse("tel:" + number);
+
+                Intent intent = new Intent(Intent.ACTION_DIAL, phoneNumber);
+                startActivity(intent);
+            } finally {
+                cursor.close();
+            }
+        }
     }
 
     @Override
@@ -282,6 +296,12 @@ public class CrimeFragment extends Fragment{
                     Toast.makeText(getActivity(), "Permission denied", Toast.LENGTH_SHORT).show();
                 }
                 return;
+            case REQUEST_PERMISSION_CALL:
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    getNumberAndCall();
+                } else {
+                    Toast.makeText(getActivity(), "Permission denied", Toast.LENGTH_SHORT).show();
+                }
         }
     }
 
