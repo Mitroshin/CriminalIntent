@@ -9,7 +9,6 @@ public class Crime {
     private String mTitle;
     private Date mDate;
     private boolean mSolved;
-    private String mSuspect;
     private long mSuspectId;
 
     public Crime() {
@@ -27,14 +26,6 @@ public class Crime {
 
     public void setSuspectId(long suspectId) {
         mSuspectId = suspectId;
-    }
-
-    public String getSuspect() {
-        return mSuspect;
-    }
-
-    public void setSuspect(String suspect) {
-        mSuspect = suspect;
     }
 
     public UUID getId() {

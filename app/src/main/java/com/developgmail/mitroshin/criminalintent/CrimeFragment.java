@@ -90,7 +90,10 @@ public class CrimeFragment extends Fragment{
                     Uri contactUri = data.getData();
 
                     String[] queryFields = new String[] {
+<<<<<<< HEAD
                             ContactsContract.Contacts.DISPLAY_NAME,
+=======
+>>>>>>> CriminalIntent/master
                             ContactsContract.Contacts._ID
                     };
 
@@ -103,11 +106,17 @@ public class CrimeFragment extends Fragment{
                         }
 
                         c.moveToFirst();
+<<<<<<< HEAD
                         String suspect = c.getString(0);
                         long contactId = c.getLong(1);
                         mCrime.setSuspect(suspect);
                         mCrime.setSuspectId(contactId);
                         mSuspectButton.setText(suspect);
+=======
+                        long suspectId = c.getLong(0);
+                        mCrime.setSuspectId(suspectId);
+                        mSuspectButton.setText(Long.toString(suspectId));
+>>>>>>> CriminalIntent/master
                     } finally {
                         c.close();
                     }
@@ -219,8 +228,8 @@ public class CrimeFragment extends Fragment{
             }
         });
 
-        if (mCrime.getSuspect() != null) {
-            mSuspectButton.setText(mCrime.getSuspect());
+        if (mCrime.getSuspectId() != 0) {
+            mSuspectButton.setText(Long.toString(mCrime.getSuspectId()));
         }
 
         mCallButton = (ImageButton) view.findViewById(R.id.call_to_suspect);
@@ -342,7 +351,7 @@ public class CrimeFragment extends Fragment{
         String dateFormat = "EEEE, MMMM d, yyyyy";
         String dateString = DateFormat.format(dateFormat, mCrime.getDate()).toString();
 
-        String suspect = mCrime.getSuspect();
+        String suspect = Long.toString(mCrime.getSuspectId());
         if (suspect == null) {
             suspect = getString(R.string.crime_report_no_suspect);
         } else {
