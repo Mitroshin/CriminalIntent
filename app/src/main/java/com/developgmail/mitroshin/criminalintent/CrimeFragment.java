@@ -8,6 +8,7 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract;
+import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -45,6 +46,7 @@ public class CrimeFragment extends Fragment{
     private static final int REQUEST_CONTACT = 2;
     private static final int REQUEST_PERMISSION_CONTACTS = 3;
     private static final int REQUEST_PERMISSION_CALL = 4;
+    private static final int REQUEST_PHOTO = 5;
 
     private Crime mCrime;
     private EditText mTitleField;
@@ -262,6 +264,21 @@ public class CrimeFragment extends Fragment{
         }
 
         mPhotoButton = (ImageButton) view.findViewById(R.id.crime_camera);
+        final Intent captureImage = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        boolean canTakePhoto =
+                mPhotoFile != null && captureImage.resolveActivity(packageManager) != null;
+        mPhotoButton.setEnabled(canTakePhoto);
+        if (canTakePhoto) {
+            Uri uri = Uri.fromFile(mPhotoFile);
+            captureImage.putExtra(MediaStore.EXTRA_OUTPUT, uri);
+        }
+        mPhotoButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivityForResult(captureImage, REQUEST_PHOTO);
+            }
+        });
+
         mPhotoView = (ImageView) view.findViewById(R.id.crime_photo);
 
         return view;
