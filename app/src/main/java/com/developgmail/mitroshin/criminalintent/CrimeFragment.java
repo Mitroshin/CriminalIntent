@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract;
@@ -120,6 +121,9 @@ public class CrimeFragment extends Fragment{
                         c.close();
                     }
                 }
+                break;
+            case REQUEST_PHOTO:
+                updatePhotoView();
         }
     }
 
@@ -280,6 +284,7 @@ public class CrimeFragment extends Fragment{
         });
 
         mPhotoView = (ImageView) view.findViewById(R.id.crime_photo);
+        updatePhotoView();
 
         return view;
     }
@@ -379,5 +384,14 @@ public class CrimeFragment extends Fragment{
                 dateString, solvedString, suspect);
 
         return report;
+    }
+
+    private void updatePhotoView() {
+        if (mPhotoFile == null || !mPhotoFile.exists()) {
+            mPhotoView.setImageDrawable(null);
+        } else {
+            Bitmap bitmap = PicturesUtil.getScaledBitmap(mPhotoFile.getPath(), getActivity());
+            mPhotoView.setImageBitmap(bitmap);
+        }
     }
 }
