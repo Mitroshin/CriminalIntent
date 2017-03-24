@@ -93,13 +93,17 @@ public class CrimeFragment extends Fragment{
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_item_delete_crime:
-                UUID crimeId = mCurrentCrime.getId();
-                CrimeLab.get(getActivity()).deleteCrime(crimeId);
-                getActivity().finish();
+                deleteCurrentCrime();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    private void deleteCurrentCrime() {
+        UUID crimeId = mCurrentCrime.getId();
+        CrimeLab.get(getActivity()).deleteCrime(crimeId);
+        getActivity().finish();
     }
 
     private void setCurrentCrime() {
@@ -118,18 +122,18 @@ public class CrimeFragment extends Fragment{
     }
 
     private void initializeLayout() {
-        setViewCrimeTitle();
-        setViewCrimeDate();
-        setViewCrimeTime();
-        setViewCrimeSolved();
-        setViewCrimeReport();
-        setViewCrimeSuspect();
-        setViewCalToSuspect();
-        setViewCrimeCamera();
-        setViewCrimePhoto();
+        initViewCrimeTitle();
+        initViewCrimeDate();
+        initViewCrimeTime();
+        initViewCrimeSolved();
+        initViewCrimeReport();
+        initViewCrimeSuspect();
+        initViewCalToSuspect();
+        initViewCrimeCamera();
+        initViewCrimePhoto();
     }
 
-    private void setViewCrimeTitle() {
+    private void initViewCrimeTitle() {
         mTitleField = (EditText) mViewLayout.findViewById(R.id.crime_title);
         mTitleField.setText(mCurrentCrime.getTitle());
         mTitleField.addTextChangedListener(new TextWatcher() {
@@ -150,35 +154,43 @@ public class CrimeFragment extends Fragment{
         });
     }
 
-    private void setViewCrimeDate() {
+    private void initViewCrimeDate() {
         mDateButton = (Button) mViewLayout.findViewById(R.id.crime_date);
         updateDateOnView();
         mDateButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                FragmentManager manager = getFragmentManager();
-                DatePickerFragment dialogDate = DatePickerFragment.newInstance(mCurrentCrime.getDate());
-                dialogDate.setTargetFragment(CrimeFragment.this, REQUEST_DATE);
-                dialogDate.show(manager, DIALOG_DATE);
+                launchDatePickerDialog();
             }
         });
     }
 
-    private void setViewCrimeTime() {
+    private void launchDatePickerDialog() {
+        FragmentManager manager = getFragmentManager();
+        DatePickerFragment dialogDate = DatePickerFragment.newInstance(mCurrentCrime.getDate());
+        dialogDate.setTargetFragment(CrimeFragment.this, REQUEST_DATE);
+        dialogDate.show(manager, DIALOG_DATE);
+    }
+
+    private void initViewCrimeTime() {
         mTimeButton = (Button) mViewLayout.findViewById(R.id.crime_time);
         updateTimeOnView();
         mTimeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                FragmentManager manager = getFragmentManager();
-                TimePickerFragment dialogTime = TimePickerFragment.newInstance(mCurrentCrime.getDate());
-                dialogTime.setTargetFragment(CrimeFragment.this, REQUEST_TIME);
-                dialogTime.show(manager, DIALOG_TIME);
+                launchTimePickerDialog();
             }
         });
     }
 
-    private void setViewCrimeSolved() {
+    private void launchTimePickerDialog() {
+        FragmentManager manager = getFragmentManager();
+        TimePickerFragment dialogTime = TimePickerFragment.newInstance(mCurrentCrime.getDate());
+        dialogTime.setTargetFragment(CrimeFragment.this, REQUEST_TIME);
+        dialogTime.show(manager, DIALOG_TIME);
+    }
+
+    private void initViewCrimeSolved() {
         mSolvedCheckBox = (CheckBox) mViewLayout.findViewById(R.id.crime_solved);
         mSolvedCheckBox.setChecked(mCurrentCrime.isSolved());
         mSolvedCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -189,7 +201,7 @@ public class CrimeFragment extends Fragment{
         });
     }
 
-    private void setViewCrimeReport() {
+    private void initViewCrimeReport() {
         mReportButton = (Button) mViewLayout.findViewById(R.id.crime_report);
         mReportButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -205,54 +217,44 @@ public class CrimeFragment extends Fragment{
     }
 
     private String getCrimeReport() {
-        String solvedString = getCurrentSolvedAsString();
-        String dateString = getCurrentDateAsString();
-        String suspect = getCurrentSuspectAsString();
-
         String report = getString(R.string.crime_report,
                 mCurrentCrime.getTitle(),
-                dateString,
-                solvedString,
-                suspect);
+                getCurrentDateAsString(),
+                getCurrentSolvedAsString(),
+                getCurrentSuspectAsString());
         return report;
     }
 
     private String getCurrentSolvedAsString() {
-        String solvedString;
         if (mCurrentCrime.isSolved()) {
-            solvedString = getString(R.string.crime_report_solved);
+            return getString(R.string.crime_report_solved);
         } else {
-            solvedString = getString(R.string.crime_report_unsolved);
+            return getString(R.string.crime_report_unsolved);
         }
-        return solvedString;
     }
 
     private String getCurrentDateAsString() {
-        String dateString;
-        dateString = DateFormat.format(DATE_TEMPLATE, mCurrentCrime.getDate()).toString();
-        return dateString;
+        return DateFormat.format(DATE_TEMPLATE, mCurrentCrime.getDate()).toString();
     }
 
     private String getCurrentSuspectAsString() {
         String suspectString;
         suspectString = Long.toString(mCurrentCrime.getSuspectId());
         if (suspectString == null) {
-            suspectString = getString(R.string.crime_report_no_suspect);
+            return getString(R.string.crime_report_no_suspect);
         } else {
-            suspectString = getString(R.string.crime_report_suspect, suspectString);
+            return getString(R.string.crime_report_suspect, suspectString);
         }
-        return suspectString;
     }
 
-    private void setViewCrimeSuspect() {
+    private void initViewCrimeSuspect() {
         final Intent pickContact = new Intent(Intent.ACTION_PICK,
                 ContactsContract.Contacts.CONTENT_URI);
-        checkContactAppIsExist(pickContact);
         mSuspectButton = (Button) mViewLayout.findViewById(R.id.crime_suspect);
+        checkContactAppIsExist(pickContact);
         mSuspectButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
                 if (isPermissionToReadContact()) {
                     startActivityForResult(pickContact, REQUEST_CONTACT);
                 } else {
@@ -261,7 +263,6 @@ public class CrimeFragment extends Fragment{
             }
 
         });
-        updateSuspectOnView();
     }
 
     private void checkContactAppIsExist(Intent pickContact) {
@@ -273,7 +274,7 @@ public class CrimeFragment extends Fragment{
     private boolean isPermissionToReadContact() {
         int permissionCheck = ContextCompat.checkSelfPermission(getActivity(),
                 android.Manifest.permission.READ_CONTACTS);
-        return permissionCheck != PackageManager.PERMISSION_GRANTED;
+        return permissionCheck == PackageManager.PERMISSION_GRANTED;
     }
 
     private void requestPermissionToReadContact() {
@@ -283,39 +284,34 @@ public class CrimeFragment extends Fragment{
             REQUEST_PERMISSION_CONTACTS);
     }
 
-    private void updateSuspectOnView() {
-        if (mCurrentCrime.getSuspectId() != 0) {
-            mSuspectButton.setText(Long.toString(mCurrentCrime.getSuspectId()));
-        }
-    }
-
-    private void setViewCalToSuspect() {
+    private void initViewCalToSuspect() {
         mCallButton = (ImageButton) mViewLayout.findViewById(R.id.call_to_suspect);
         mCallButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                checkForSuspect();
-                if (isPermissionToCall()) {
-                    tryCallToSuspect();
+                if (isSuspectSelected()) {
+                    if (isPermissionToCall()) {
+                        tryCallToSuspect();
+                    } else {
+                        requestPermissionToCall();
+                    }
                 } else {
-                    requestPermissionToCall();
+                    Toast.makeText(CrimeFragment.this.getActivity()
+                            , "You need to choose suspect"
+                            , Toast.LENGTH_SHORT).show();
                 }
             }
         });
     }
 
-    private void checkForSuspect() {
-        if (mCurrentCrime.getSuspect() == null) {
-            Toast.makeText(CrimeFragment.this.getActivity()
-                    , "You need to choose suspect"
-                    , Toast.LENGTH_SHORT).show();
-        }
+    private boolean isSuspectSelected() {
+        return mCurrentCrime.getSuspect() != null;
     }
 
     private boolean isPermissionToCall() {
         int permissionCheck = ContextCompat.checkSelfPermission(getActivity(),
                 Manifest.permission.CALL_PHONE);
-        return permissionCheck != PackageManager.PERMISSION_GRANTED;
+        return permissionCheck == PackageManager.PERMISSION_GRANTED;
     }
 
     private void requestPermissionToCall() {
@@ -325,7 +321,7 @@ public class CrimeFragment extends Fragment{
         REQUEST_PERMISSION_CALL);
     }
 
-    private void setViewCrimeCamera() {
+    private void initViewCrimeCamera() {
         mPhotoButton = (ImageButton) mViewLayout.findViewById(R.id.crime_camera);
         final Intent captureImage = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         boolean canTakePhoto =
@@ -343,7 +339,7 @@ public class CrimeFragment extends Fragment{
         });
     }
 
-    private void setViewCrimePhoto() {
+    private void initViewCrimePhoto() {
         mPhotoView = (ImageView) mViewLayout.findViewById(R.id.crime_photo);
         updatePhotoOnView();
     }
