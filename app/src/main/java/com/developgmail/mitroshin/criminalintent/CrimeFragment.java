@@ -53,6 +53,11 @@ public class CrimeFragment extends Fragment{
     private static final String DATE_TEMPLATE = "EEEE, MMMM d, yyyyy";
 
     private Crime mCurrentCrime;
+    private File mPhotoFile;
+    private PackageManager mPackageManager;
+    private View mViewLayout;
+    private FragmentManager mFragmentManager;
+
     private EditText mTitleField;
     private Button mDateButton;
     private Button mTimeButton;
@@ -62,9 +67,6 @@ public class CrimeFragment extends Fragment{
     private ImageButton mCallButton;
     private ImageButton mPhotoButton;
     private ImageView mPhotoView;
-    private File mPhotoFile;
-    private PackageManager mPackageManager;
-    private View mViewLayout;
 
     public static CrimeFragment newInstance(UUID crimeId) {
         Bundle args = new Bundle();
@@ -78,7 +80,6 @@ public class CrimeFragment extends Fragment{
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mPackageManager = getActivity().getPackageManager();
         setHasOptionsMenu(true);
         setCurrentCrime();
     }
@@ -117,6 +118,8 @@ public class CrimeFragment extends Fragment{
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
         mViewLayout = inflater.inflate(R.layout.fragment_crime, container, false);
+        mPackageManager = getActivity().getPackageManager();
+        mFragmentManager = getFragmentManager();
         initializeLayout();
         return mViewLayout;
     }
@@ -138,19 +141,14 @@ public class CrimeFragment extends Fragment{
         mTitleField.setText(mCurrentCrime.getTitle());
         mTitleField.addTextChangedListener(new TextWatcher() {
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-            }
-
-            @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 mCurrentCrime.setTitle(s.toString());
             }
 
             @Override
-            public void afterTextChanged(Editable s) {
-
-            }
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
+            @Override
+            public void afterTextChanged(Editable s) { }
         });
     }
 
@@ -166,10 +164,9 @@ public class CrimeFragment extends Fragment{
     }
 
     private void launchDatePickerDialog() {
-        FragmentManager manager = getFragmentManager();
         DatePickerFragment dialogDate = DatePickerFragment.newInstance(mCurrentCrime.getDate());
         dialogDate.setTargetFragment(CrimeFragment.this, REQUEST_DATE);
-        dialogDate.show(manager, DIALOG_DATE);
+        dialogDate.show(mFragmentManager, DIALOG_DATE);
     }
 
     private void initViewCrimeTime() {
@@ -184,10 +181,9 @@ public class CrimeFragment extends Fragment{
     }
 
     private void launchTimePickerDialog() {
-        FragmentManager manager = getFragmentManager();
         TimePickerFragment dialogTime = TimePickerFragment.newInstance(mCurrentCrime.getDate());
         dialogTime.setTargetFragment(CrimeFragment.this, REQUEST_TIME);
-        dialogTime.show(manager, DIALOG_TIME);
+        dialogTime.show(mFragmentManager, DIALOG_TIME);
     }
 
     private void initViewCrimeSolved() {
@@ -238,8 +234,7 @@ public class CrimeFragment extends Fragment{
     }
 
     private String getCurrentSuspectAsString() {
-        String suspectString;
-        suspectString = Long.toString(mCurrentCrime.getSuspectId());
+        String suspectString = mCurrentCrime.getSuspect();
         if (suspectString == null) {
             return getString(R.string.crime_report_no_suspect);
         } else {
@@ -289,29 +284,23 @@ public class CrimeFragment extends Fragment{
         mCallButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (isSuspectSelected()) {
-                    if (isPermissionToCall()) {
-                        tryCallToSuspect();
-                    } else {
-                        requestPermissionToCall();
-                    }
+                if (isSuspectSelected() && isPermissionToCall()) {
+                    tryCallToSuspect();
                 } else {
-                    Toast.makeText(CrimeFragment.this.getActivity()
-                            , "You need to choose suspect"
-                            , Toast.LENGTH_SHORT).show();
+                    requestPermissionToCall();
                 }
             }
         });
-    }
-
-    private boolean isSuspectSelected() {
-        return mCurrentCrime.getSuspect() != null;
     }
 
     private boolean isPermissionToCall() {
         int permissionCheck = ContextCompat.checkSelfPermission(getActivity(),
                 Manifest.permission.CALL_PHONE);
         return permissionCheck == PackageManager.PERMISSION_GRANTED;
+    }
+
+    private boolean isSuspectSelected() {
+        return mCurrentCrime.getSuspect() != null;
     }
 
     private void requestPermissionToCall() {
@@ -322,21 +311,25 @@ public class CrimeFragment extends Fragment{
     }
 
     private void initViewCrimeCamera() {
-        mPhotoButton = (ImageButton) mViewLayout.findViewById(R.id.crime_camera);
         final Intent captureImage = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        boolean canTakePhoto =
-                mPhotoFile != null && captureImage.resolveActivity(mPackageManager) != null;
-        mPhotoButton.setEnabled(canTakePhoto);
-        if (canTakePhoto) {
-            Uri uri = Uri.fromFile(mPhotoFile);
-            captureImage.putExtra(MediaStore.EXTRA_OUTPUT, uri);
+        mPhotoButton = (ImageButton) mViewLayout.findViewById(R.id.crime_camera);
+        if (!canTakePhoto(captureImage)) {
+            mPhotoButton.setEnabled(false);
+            return;
         }
+        Uri uriToResultImage = Uri.fromFile(mPhotoFile);
+        captureImage.putExtra(MediaStore.EXTRA_OUTPUT, uriToResultImage);
+
         mPhotoButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 startActivityForResult(captureImage, REQUEST_PHOTO);
             }
         });
+    }
+
+    private boolean canTakePhoto(Intent captureImage) {
+        return mPhotoFile != null && captureImage.resolveActivity(mPackageManager) != null;
     }
 
     private void initViewCrimePhoto() {
@@ -349,7 +342,6 @@ public class CrimeFragment extends Fragment{
         if (resultCode != Activity.RESULT_OK) {
             return;
         }
-
         switch (requestCode) {
             case REQUEST_DATE:
                 setDateFromExtraData(data);
@@ -363,10 +355,10 @@ public class CrimeFragment extends Fragment{
                 updatePhotoOnView();
                 break;
             case REQUEST_CONTACT:
-                Cursor cursorContacts = null;
-                if (data != null) {
-                    cursorContacts = getCursorName(data);
+                if (data == null) {
+                    return;
                 }
+                Cursor cursorContacts = getCursorName(data);
                 if (cursorContacts != null) {
                     trySetSelectedSuspect(cursorContacts);
                 }
@@ -393,7 +385,6 @@ public class CrimeFragment extends Fragment{
         if (mPhotoFile == null || !mPhotoFile.exists()) {
             mPhotoView.setImageDrawable(null);
         } else {
-            // TODO Скорее всего надо бы выделить в отдельный метод
             Bitmap bitmap = PicturesUtil.getScaledBitmap(mPhotoFile.getPath(), getActivity());
             mPhotoView.setImageBitmap(bitmap);
         }
@@ -414,6 +405,7 @@ public class CrimeFragment extends Fragment{
     }
 
     private void trySetSelectedSuspect(Cursor cursorContacts) {
+        // TODO Уточнить - правильно ли используется в данном случае выделение блока try в отдельный метод
         try {
             setSelectedSuspect(cursorContacts);
         } finally {
@@ -428,10 +420,10 @@ public class CrimeFragment extends Fragment{
         cursorContacts.moveToFirst();
         String suspect = cursorContacts.getString(0);
         long contactId = cursorContacts.getLong(1);
-        updateSuspectOnView(suspect, contactId);
+        updateSuspectData(suspect, contactId);
     }
 
-    private void updateSuspectOnView(String suspect, long contactId) {
+    private void updateSuspectData(String suspect, long contactId) {
         mCurrentCrime.setSuspect(suspect);
         mCurrentCrime.setSuspectId(contactId);
         mSuspectButton.setText(suspect);
@@ -446,14 +438,14 @@ public class CrimeFragment extends Fragment{
                     Intent pickContact = new Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI);
                     startActivityForResult(pickContact, REQUEST_CONTACT);
                 } else {
-                    Toast.makeText(getActivity(), "Permission denied", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getActivity(), "Permission to contact denied", Toast.LENGTH_SHORT).show();
                 }
                 return;
             case REQUEST_PERMISSION_CALL:
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     tryCallToSuspect();
                 } else {
-                    Toast.makeText(getActivity(), "Permission denied", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getActivity(), "Permission to call denied", Toast.LENGTH_SHORT).show();
                 }
         }
     }
