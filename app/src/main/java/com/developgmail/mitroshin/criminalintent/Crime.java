@@ -21,22 +21,6 @@ public class Crime {
         mDate = new Date();
     }
 
-    public String getSuspect() {
-        return mSuspect;
-    }
-
-    public void setSuspect(String suspect) {
-        mSuspect = suspect;
-    }
-
-    public long getSuspectId() {
-        return mSuspectId;
-    }
-
-    public void setSuspectId(long suspectId) {
-        mSuspectId = suspectId;
-    }
-
     public UUID getId() {
         return mId;
     }
@@ -63,6 +47,22 @@ public class Crime {
 
     public void setSolved(boolean solved) {
         mSolved = solved;
+    }
+
+    public String getSuspect() {
+        return mSuspect;
+    }
+
+    public void setSuspect(String suspect) {
+        mSuspect = suspect;
+    }
+
+    public long getSuspectId() {
+        return mSuspectId;
+    }
+
+    public void setSuspectId(long suspectId) {
+        mSuspectId = suspectId;
     }
 
     public String getPhotoFileName() {
