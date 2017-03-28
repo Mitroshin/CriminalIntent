@@ -49,6 +49,7 @@ public class CrimeFragment extends Fragment{
     private static final String ARG_CRIME_ID = "crime_id";
     private static final String DIALOG_DATE = "DialogDate";
     private static final String DIALOG_TIME = "DialogTime";
+    private static final String DIALOG_PHOTO = "DialogPhoto";
     private static final String TIME_TEMPLATE = "kk : mm";
     private static final String DATE_TEMPLATE = "EEEE, MMMM d, yyyyy";
 
@@ -335,6 +336,17 @@ public class CrimeFragment extends Fragment{
     private void initViewCrimePhoto() {
         mPhotoView = (ImageView) mViewLayout.findViewById(R.id.crime_photo);
         updatePhotoOnView();
+        mPhotoView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                launchPhotoDialog();
+            }
+        });
+    }
+
+    private void launchPhotoDialog() {
+        PhotoFragment dialogPhoto = PhotoFragment.newInstance(mPhotoFile.getPath());
+        dialogPhoto.show(mFragmentManager, DIALOG_PHOTO);
     }
 
     @Override
