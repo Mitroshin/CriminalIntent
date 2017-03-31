@@ -3,6 +3,10 @@ package com.developgmail.mitroshin.criminalintent;
 import java.util.Date;
 import java.util.UUID;
 
+/**
+ * Класс модели. Экземпляры класса описывают каждое отдельное преступление.*
+ */
+
 public class Crime {
 
     private UUID mId;

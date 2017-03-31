@@ -214,12 +214,15 @@ public class CrimeFragment extends Fragment{
     }
 
     private String getCrimeReport() {
-        String report = getString(R.string.crime_report,
+        return getString(R.string.crime_report,
                 mCurrentCrime.getTitle(),
                 getCurrentDateAsString(),
                 getCurrentSolvedAsString(),
                 getCurrentSuspectAsString());
-        return report;
+    }
+
+    private String getCurrentDateAsString() {
+        return DateFormat.format(DATE_TEMPLATE, mCurrentCrime.getDate()).toString();
     }
 
     private String getCurrentSolvedAsString() {
@@ -228,10 +231,6 @@ public class CrimeFragment extends Fragment{
         } else {
             return getString(R.string.crime_report_unsolved);
         }
-    }
-
-    private String getCurrentDateAsString() {
-        return DateFormat.format(DATE_TEMPLATE, mCurrentCrime.getDate()).toString();
     }
 
     private String getCurrentSuspectAsString() {
@@ -274,10 +273,9 @@ public class CrimeFragment extends Fragment{
     }
 
     private void requestPermissionToReadContact() {
-        requestPermissions(new String[] {
-                Manifest.permission.READ_CONTACTS
-            },
-            REQUEST_PERMISSION_CONTACTS);
+        requestPermissions(
+                new String[] { Manifest.permission.READ_CONTACTS },
+                REQUEST_PERMISSION_CONTACTS);
     }
 
     private void initViewCalToSuspect() {
@@ -286,12 +284,19 @@ public class CrimeFragment extends Fragment{
             @Override
             public void onClick(View v) {
                 if (isSuspectSelected() && isPermissionToCall()) {
-                    tryCallToSuspect();
+                    Cursor cursorNumber = getCursorNumber();
+                    if (cursorNumber != null && cursorNumber.getCount() > 0) {
+                        tryCallToSuspect(cursorNumber);
+                    }
                 } else {
                     requestPermissionToCall();
                 }
             }
         });
+    }
+
+    private boolean isSuspectSelected() {
+        return mCurrentCrime.getSuspect() != null;
     }
 
     private boolean isPermissionToCall() {
@@ -300,18 +305,14 @@ public class CrimeFragment extends Fragment{
         return permissionCheck == PackageManager.PERMISSION_GRANTED;
     }
 
-    private boolean isSuspectSelected() {
-        return mCurrentCrime.getSuspect() != null;
-    }
-
     private void requestPermissionToCall() {
-        requestPermissions(new String[] {
-                Manifest.permission.CALL_PHONE
-        },
-        REQUEST_PERMISSION_CALL);
+        requestPermissions(
+                new String[] { Manifest.permission.CALL_PHONE },
+                REQUEST_PERMISSION_CALL);
     }
 
     private void initViewCrimeCamera() {
+        // TODO Метод надо переделать. Мне не нравится.
         final Intent captureImage = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         mPhotoButton = (ImageButton) mViewLayout.findViewById(R.id.crime_camera);
         if (!canTakePhoto(captureImage)) {
@@ -371,7 +372,7 @@ public class CrimeFragment extends Fragment{
                     return;
                 }
                 Cursor cursorContacts = getCursorName(data);
-                if (cursorContacts != null) {
+                if (cursorContacts != null && cursorContacts.getCount() != 0) {
                     trySetSelectedSuspect(cursorContacts);
                 }
                 break;
@@ -410,10 +411,8 @@ public class CrimeFragment extends Fragment{
                 ContactsContract.Contacts._ID
         };
 
-        Cursor cursorName = getActivity().getContentResolver()
+        return getActivity().getContentResolver()
                 .query(contactUri, queryFields, null, null, null);
-
-        return cursorName;
     }
 
     private void trySetSelectedSuspect(Cursor cursorContacts) {
@@ -426,9 +425,6 @@ public class CrimeFragment extends Fragment{
     }
 
     private void setSelectedSuspect(Cursor cursorContacts) {
-        if (cursorContacts.getCount() == 0) {
-            return;
-        }
         cursorContacts.moveToFirst();
         String suspect = cursorContacts.getString(0);
         long contactId = cursorContacts.getLong(1);
@@ -455,22 +451,13 @@ public class CrimeFragment extends Fragment{
                 return;
             case REQUEST_PERMISSION_CALL:
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    tryCallToSuspect();
+                    Cursor cursorNumber = getCursorNumber();
+                    if (cursorNumber != null && cursorNumber.getCount() > 0) {
+                        tryCallToSuspect(cursorNumber);
+                    }
                 } else {
                     Toast.makeText(getActivity(), "Permission to call denied", Toast.LENGTH_SHORT).show();
                 }
-        }
-    }
-
-    private void tryCallToSuspect() {
-        Cursor cursorNumber = getCursorNumber();
-        if (cursorNumber != null && cursorNumber.getCount() > 0) {
-            try {
-                Uri phoneNumber = getPhoneNumberFromCursor(cursorNumber);
-                callToSuspect(phoneNumber);
-            } finally {
-                cursorNumber.close();
-            }
         }
     }
 
@@ -478,17 +465,20 @@ public class CrimeFragment extends Fragment{
         Uri contentUri = ContactsContract.CommonDataKinds.Phone.CONTENT_URI;
 
         String selectClause = ContactsContract.CommonDataKinds.Phone.CONTACT_ID + " = ?";
-        String[] fields = {
-                ContactsContract.CommonDataKinds.Phone.NUMBER
-        };
-        String[] selectParams = {
-                Long.toString(mCurrentCrime.getSuspectId())
-        };
+        String[] fields = { ContactsContract.CommonDataKinds.Phone.NUMBER };
+        String[] selectParams = { Long.toString(mCurrentCrime.getSuspectId()) };
 
-        Cursor cursorNumber = getActivity().getContentResolver()
+        return getActivity().getContentResolver()
                 .query(contentUri, fields, selectClause, selectParams, null);
+    }
 
-        return cursorNumber;
+    private void tryCallToSuspect(Cursor cursorNumber) {
+        try {
+            Uri phoneNumber = getPhoneNumberFromCursor(cursorNumber);
+            callToSuspect(phoneNumber);
+        } finally {
+            cursorNumber.close();
+        }
     }
 
     private Uri getPhoneNumberFromCursor(Cursor cursor) {
