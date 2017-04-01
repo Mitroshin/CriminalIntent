@@ -19,6 +19,7 @@ public class CrimeLab {
     private static CrimeLab sCrimeLab;
     private Context mContext;
     private SQLiteDatabase mDatabase;
+    private List<Crime> crimeList;
 
     public static CrimeLab get(Context context) {
         if (sCrimeLab == null) {
@@ -33,53 +34,54 @@ public class CrimeLab {
     }
 
     public List<Crime> getCrimes() {
-        List<Crime> crimes = new ArrayList<>();
+        crimeList = new ArrayList<>();
+        tryToFillCrimeList();
+        return crimeList;
+    }
 
-        CrimeCursorWrapper cursor = queryCrimes(null, null);
-
+    private void tryToFillCrimeList() {
+        CrimeCursorWrapper cursorWrapper = queryCrimes(null, null);
         try {
-            cursor.moveToFirst();
-            while(!cursor.isAfterLast()) {
-                crimes.add(cursor.getCrime());
-                cursor.moveToNext();
-            }
+            fillCrimeList(cursorWrapper);
         } finally {
-            cursor.close();
+            cursorWrapper.close();
         }
+    }
 
-        return crimes;
+    private void fillCrimeList(CrimeCursorWrapper cursorWrapper) {
+        cursorWrapper.moveToFirst();
+        while(!cursorWrapper.isAfterLast()) {
+            crimeList.add(cursorWrapper.getCrime());
+            cursorWrapper.moveToNext();
+        }
     }
 
     public Crime getCrime(UUID id) {
-        CrimeCursorWrapper cursor = queryCrimes(
+        CrimeCursorWrapper cursorWrapper = queryCrimes(
                 CrimeTable.Cols.UUID + " = ?",
-                new String[] {
-                        id.toString()
-                }
+                new String[] { id.toString() }
         );
 
         try {
-            if (cursor.getCount() == 0) {
+            if (cursorWrapper.getCount() == 0) {
                 return null;
             }
 
-            cursor.moveToFirst();
-            return cursor.getCrime();
+            cursorWrapper.moveToFirst();
+            return cursorWrapper.getCrime();
         } finally {
-            cursor.close();
+            cursorWrapper.close();
         }
     }
 
-    public void addCrime(Crime c) {
-        ContentValues values = getContentValues(c);
+    public void addCrime(Crime crime) {
+        ContentValues values = getContentValues(crime);
         mDatabase.insert(CrimeTable.NAME, null, values);
     }
 
     public void deleteCrime(UUID crimeId) {
         mDatabase.delete(CrimeTable.NAME, CrimeTable.Cols.UUID + " = ?",
-                new String[] {
-                        crimeId.toString()
-                });
+                new String[] { crimeId.toString() });
     }
 
     private static ContentValues getContentValues(Crime crime) {
@@ -97,11 +99,8 @@ public class CrimeLab {
     public void updateCrime(Crime crime) {
         String uuidString = crime.getId().toString();
         ContentValues values = getContentValues(crime);
-
         mDatabase.update(CrimeTable.NAME, values, CrimeTable.Cols.UUID + " = ?",
-                new String[] {
-                        uuidString
-                });
+                new String[] { uuidString });
     }
 
     private CrimeCursorWrapper queryCrimes(String whereClause, String[] whereArgs) {
@@ -114,17 +113,15 @@ public class CrimeLab {
                 null,
                 null
         );
-
         return new CrimeCursorWrapper(cursor);
     }
 
     public File getPhotoFile(Crime crime) {
         File externalFileDir = mContext.getExternalFilesDir(Environment.DIRECTORY_PICTURES);
-
         if (externalFileDir == null) {
             return null;
+        } else {
+            return new File(externalFileDir, crime.getPhotoFileName());
         }
-
-        return new File(externalFileDir, crime.getPhotoFileName());
     }
 }
