@@ -37,6 +37,10 @@ public class PhotoFragment extends DialogFragment{
         } else {
             Toast.makeText(getActivity(), "You need to create photo", Toast.LENGTH_SHORT).show();
         }
-        return new AlertDialog.Builder(getActivity()).setView(v).create();
+        return new AlertDialog.Builder(getActivity())
+                .setTitle("Evidence")
+                .setPositiveButton(android.R.string.ok, null)
+                .setView(v)
+                .create();
     }
 }
