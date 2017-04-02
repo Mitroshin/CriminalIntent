@@ -13,7 +13,7 @@ import android.support.v7.app.AppCompatActivity;
 import java.util.List;
 import java.util.UUID;
 
-public class CrimePagerActivity extends AppCompatActivity {
+public class CrimePagerActivity extends AppCompatActivity implements CrimeFragment.Callbacks {
 
     private static final String EXTRA_CRIME_ID =
             "com.developgmail.mitroshin.criminalintent.crime_id";
@@ -57,5 +57,12 @@ public class CrimePagerActivity extends AppCompatActivity {
                 break;
             }
         }
+    }
+
+//    Интерфейс CrimeFragment.Callbacks должен быть реализован каждой активностью,
+// выполняющей роль хоста для CrimeFragment
+    @Override
+    public void OnCrimeUpdated(Crime crime) {
+
     }
 }

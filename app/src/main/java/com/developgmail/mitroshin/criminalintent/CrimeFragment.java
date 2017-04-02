@@ -58,6 +58,7 @@ public class CrimeFragment extends Fragment{
     private PackageManager mPackageManager;
     private View mViewLayout;
     private FragmentManager mFragmentManager;
+    private Callbacks mCallbacks;
 
     private EditText mTitleField;
     private Button mDateButton;
@@ -69,6 +70,10 @@ public class CrimeFragment extends Fragment{
     private ImageButton mPhotoButton;
     private ImageView mPhotoView;
 
+    public interface Callbacks {
+        void OnCrimeUpdated(Crime crime);
+    }
+
     public static CrimeFragment newInstance(UUID crimeId) {
         Bundle args = new Bundle();
         args.putSerializable(ARG_CRIME_ID, crimeId);
@@ -76,6 +81,12 @@ public class CrimeFragment extends Fragment{
         CrimeFragment fragment = new CrimeFragment();
         fragment.setArguments(args);
         return fragment;
+    }
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        mCallbacks = (Callbacks) activity;
     }
 
     @Override
@@ -496,5 +507,11 @@ public class CrimeFragment extends Fragment{
     public void onPause() {
         super.onPause();
         CrimeLab.get(getActivity()).updateCrime(mCurrentCrime);
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        mCallbacks = null;
     }
 }
