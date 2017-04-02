@@ -155,6 +155,7 @@ public class CrimeFragment extends Fragment{
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 mCurrentCrime.setTitle(s.toString());
+                updateCrime();
             }
 
             @Override
@@ -205,6 +206,7 @@ public class CrimeFragment extends Fragment{
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 mCurrentCrime.setSolved(isChecked);
+                updateCrime();
             }
         });
     }
@@ -369,13 +371,16 @@ public class CrimeFragment extends Fragment{
         switch (requestCode) {
             case REQUEST_DATE:
                 setDateFromExtraData(data);
+                updateCrime();
                 updateDateOnView();
                 break;
             case REQUEST_TIME:
                 setDateFromExtraData(data);
+                updateCrime();
                 updateTimeOnView();
                 break;
             case REQUEST_PHOTO:
+                updateCrime();
                 updatePhotoOnView();
                 break;
             case REQUEST_CONTACT:
@@ -445,7 +450,13 @@ public class CrimeFragment extends Fragment{
     private void updateSuspectData(String suspect, long contactId) {
         mCurrentCrime.setSuspect(suspect);
         mCurrentCrime.setSuspectId(contactId);
+        updateCrime();
         mSuspectButton.setText(suspect);
+    }
+
+    private void updateCrime() {
+        CrimeLab.get(getActivity()).updateCrime(mCurrentCrime);
+        mCallbacks.OnCrimeUpdated(mCurrentCrime);
     }
 
     @Override
