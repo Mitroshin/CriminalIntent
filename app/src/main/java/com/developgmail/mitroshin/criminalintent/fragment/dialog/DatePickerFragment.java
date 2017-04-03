@@ -1,9 +1,11 @@
-package com.developgmail.mitroshin.criminalintent;
+package com.developgmail.mitroshin.criminalintent.fragment.dialog;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.DatePicker;
+
+import com.developgmail.mitroshin.criminalintent.R;
 
 import java.util.Calendar;
 import java.util.Date;

@@ -1,4 +1,4 @@
-package com.developgmail.mitroshin.criminalintent;
+package com.developgmail.mitroshin.criminalintent.model;
 
 import java.util.Date;
 import java.util.UUID;

@@ -1,4 +1,4 @@
-package com.developgmail.mitroshin.criminalintent;
+package com.developgmail.mitroshin.criminalintent.fragment;
 
 import android.Manifest;
 import android.app.Activity;
@@ -32,6 +32,14 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Toast;
+
+import com.developgmail.mitroshin.criminalintent.util.PicturesUtil;
+import com.developgmail.mitroshin.criminalintent.R;
+import com.developgmail.mitroshin.criminalintent.fragment.dialog.DatePickerFragment;
+import com.developgmail.mitroshin.criminalintent.fragment.dialog.PhotoFragment;
+import com.developgmail.mitroshin.criminalintent.fragment.dialog.TimePickerFragment;
+import com.developgmail.mitroshin.criminalintent.model.Crime;
+import com.developgmail.mitroshin.criminalintent.model.CrimeLab;
 
 import java.io.File;
 import java.util.Date;

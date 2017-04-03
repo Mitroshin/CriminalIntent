@@ -1,4 +1,4 @@
-package com.developgmail.mitroshin.criminalintent;
+package com.developgmail.mitroshin.criminalintent.model;
 
 import android.content.ContentValues;
 import android.content.Context;

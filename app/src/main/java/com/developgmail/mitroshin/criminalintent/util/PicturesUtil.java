@@ -1,4 +1,4 @@
-package com.developgmail.mitroshin.criminalintent;
+package com.developgmail.mitroshin.criminalintent.util;
 
 import android.app.Activity;
 import android.graphics.Bitmap;

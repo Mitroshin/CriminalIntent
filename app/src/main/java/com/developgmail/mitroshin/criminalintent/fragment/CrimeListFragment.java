@@ -1,4 +1,4 @@
-package com.developgmail.mitroshin.criminalintent;
+package com.developgmail.mitroshin.criminalintent.fragment;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -15,6 +15,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.TextView;
+
+import com.developgmail.mitroshin.criminalintent.R;
+import com.developgmail.mitroshin.criminalintent.model.Crime;
+import com.developgmail.mitroshin.criminalintent.model.CrimeLab;
 
 import java.util.List;
 

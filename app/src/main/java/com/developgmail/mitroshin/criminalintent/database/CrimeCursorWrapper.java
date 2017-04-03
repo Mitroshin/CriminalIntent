@@ -3,7 +3,7 @@ package com.developgmail.mitroshin.criminalintent.database;
 import android.database.Cursor;
 import android.database.CursorWrapper;
 
-import com.developgmail.mitroshin.criminalintent.Crime;
+import com.developgmail.mitroshin.criminalintent.model.Crime;
 import com.developgmail.mitroshin.criminalintent.database.CrimeDBSchema.CrimeTable;
 
 import java.util.Date;

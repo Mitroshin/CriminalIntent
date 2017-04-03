@@ -1,7 +1,12 @@
-package com.developgmail.mitroshin.criminalintent;
+package com.developgmail.mitroshin.criminalintent.activity;
 
 import android.content.Intent;
 import android.support.v4.app.Fragment;
+
+import com.developgmail.mitroshin.criminalintent.R;
+import com.developgmail.mitroshin.criminalintent.model.Crime;
+import com.developgmail.mitroshin.criminalintent.fragment.CrimeFragment;
+import com.developgmail.mitroshin.criminalintent.fragment.CrimeListFragment;
 
 public class CrimeListActivity extends SingleFragmentActivity
         implements CrimeListFragment.Callbacks, CrimeFragment.Callbacks {

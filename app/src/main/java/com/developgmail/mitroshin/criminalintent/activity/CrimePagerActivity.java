@@ -1,4 +1,4 @@
-package com.developgmail.mitroshin.criminalintent;
+package com.developgmail.mitroshin.criminalintent.activity;
 
 import android.content.Context;
 import android.content.Intent;
@@ -9,6 +9,11 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
+
+import com.developgmail.mitroshin.criminalintent.R;
+import com.developgmail.mitroshin.criminalintent.model.Crime;
+import com.developgmail.mitroshin.criminalintent.fragment.CrimeFragment;
+import com.developgmail.mitroshin.criminalintent.model.CrimeLab;
 
 import java.util.List;
 import java.util.UUID;

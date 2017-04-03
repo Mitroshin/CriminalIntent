@@ -1,4 +1,4 @@
-package com.developgmail.mitroshin.criminalintent;
+package com.developgmail.mitroshin.criminalintent.fragment.dialog;
 
 import android.app.Dialog;
 import android.graphics.Bitmap;
@@ -10,6 +10,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.Toast;
+
+import com.developgmail.mitroshin.criminalintent.util.PicturesUtil;
+import com.developgmail.mitroshin.criminalintent.R;
 
 public class PhotoFragment extends DialogFragment{
 
