@@ -120,7 +120,7 @@ public class CrimeListFragment extends Fragment {
     private void updateSubtitle() {
         CrimeLab crimeLab = CrimeLab.get(getActivity());
 
-        int crimeCount = crimeLab.getCrimes().size();
+        int crimeCount = crimeLab.getCrimeGroup().size();
         String subtitle = getResources().getQuantityString(R.plurals.subtitle_plural, crimeCount,
                 crimeCount);
 
@@ -134,7 +134,7 @@ public class CrimeListFragment extends Fragment {
 
     public void updateUI() {
         CrimeLab crimeLab = CrimeLab.get(getActivity());
-        List<Crime> crimes = crimeLab.getCrimes();
+        List<Crime> crimes = crimeLab.getCrimeGroup();
 
         if (mAdapter == null) {
             mAdapter = new CrimeAdapter(crimes);

@@ -129,7 +129,7 @@ public class CrimeFragment extends Fragment{
 
     private void setCurrentCrime() {
         UUID crimeId = (UUID) getArguments().getSerializable(ARG_CRIME_ID);
-        mCurrentCrime = CrimeLab.get(getActivity()).getCrime(crimeId);
+        mCurrentCrime = CrimeLab.get(getActivity()).getCrimeById(crimeId);
         mPhotoFile = CrimeLab.get(getActivity()).getPhotoFile(mCurrentCrime);
     }
 
